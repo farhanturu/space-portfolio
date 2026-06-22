@@ -30,7 +30,8 @@ export default function ContactSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6 }}
-              className="text-accent-dim text-sm tracking-[0.3em] uppercase mb-4 font-mono"
+              className="text-sm tracking-[0.3em] uppercase mb-4 font-mono"
+              style={{ color: "#a78bfa" }}
             >
               Get In Touch
             </motion.p>
@@ -40,9 +41,15 @@ export default function ContactSection() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-4xl md:text-6xl font-bold tracking-tight mb-6"
             >
-              Let&apos;s create
+              <span style={{ color: "#ffffff" }}>Let&apos;s create</span>
               <br />
-              <span className="bg-gradient-to-r from-accent to-pink-400 bg-clip-text text-transparent">
+              <span
+                style={{
+                  background: "linear-gradient(to right, #7c3aed, #fb64b6)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+              >
                 something cosmic
               </span>
             </motion.h2>
@@ -50,7 +57,8 @@ export default function ContactSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-white/50 text-lg leading-relaxed mb-10 max-w-md"
+              className="text-lg leading-relaxed mb-10 max-w-md"
+              style={{ color: "rgba(255,255,255,0.5)" }}
             >
               Have a project in mind? Let&apos;s collaborate and build something
               extraordinary together. I&apos;m always open to new challenges.
@@ -74,7 +82,12 @@ export default function ContactSection() {
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.1, y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  className="w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white/50 hover:text-white hover:border-accent/30 hover:bg-accent/10 transition-all duration-300"
+                  className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300"
+                  style={{
+                    backgroundColor: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.05)",
+                    color: "rgba(255,255,255,0.5)",
+                  }}
                 >
                   <social.icon size={20} />
                 </motion.a>
@@ -90,7 +103,7 @@ export default function ContactSection() {
             className="space-y-6"
           >
             <div>
-              <label className="block text-sm text-white/40 mb-2 font-mono">
+              <label className="block text-sm mb-2 font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>
                 Name
               </label>
               <input
@@ -99,13 +112,18 @@ export default function ContactSection() {
                 onChange={(e) =>
                   setFormState({ ...formState, name: e.target.value })
                 }
-                className="w-full px-5 py-3.5 bg-white/[0.03] border border-white/5 rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:bg-accent/5 transition-all duration-300"
+                className="w-full px-5 py-3.5 rounded-xl text-white transition-all duration-300"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.05)",
+                  outline: "none",
+                }}
                 placeholder="Your name"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm text-white/40 mb-2 font-mono">
+              <label className="block text-sm mb-2 font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>
                 Email
               </label>
               <input
@@ -114,13 +132,18 @@ export default function ContactSection() {
                 onChange={(e) =>
                   setFormState({ ...formState, email: e.target.value })
                 }
-                className="w-full px-5 py-3.5 bg-white/[0.03] border border-white/5 rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:bg-accent/5 transition-all duration-300"
+                className="w-full px-5 py-3.5 rounded-xl text-white transition-all duration-300"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.05)",
+                  outline: "none",
+                }}
                 placeholder="your@email.com"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm text-white/40 mb-2 font-mono">
+              <label className="block text-sm mb-2 font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>
                 Message
               </label>
               <textarea
@@ -129,7 +152,12 @@ export default function ContactSection() {
                   setFormState({ ...formState, message: e.target.value })
                 }
                 rows={5}
-                className="w-full px-5 py-3.5 bg-white/[0.03] border border-white/5 rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:bg-accent/5 transition-all duration-300 resize-none"
+                className="w-full px-5 py-3.5 rounded-xl text-white transition-all duration-300 resize-none"
+                style={{
+                  backgroundColor: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.05)",
+                  outline: "none",
+                }}
                 placeholder="Tell me about your project..."
                 required
               />
@@ -142,7 +170,8 @@ export default function ContactSection() {
                 boxShadow: "0 0 30px rgba(124, 58, 237, 0.3)",
               }}
               whileTap={{ scale: 0.98 }}
-              className="w-full py-4 bg-accent text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-accent/80 transition-colors duration-300"
+              className="w-full py-4 text-white rounded-xl font-medium flex items-center justify-center gap-2 transition-colors duration-300"
+              style={{ backgroundColor: "#7c3aed" }}
             >
               {submitted ? (
                 "Message Sent!"

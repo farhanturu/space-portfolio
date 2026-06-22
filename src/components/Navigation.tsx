@@ -27,11 +27,12 @@ export default function Navigation() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-background/80 backdrop-blur-xl border-b border-white/5"
-            : "bg-transparent"
-        }`}
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+        style={{
+          backgroundColor: scrolled ? "rgba(3,0,20,0.8)" : "transparent",
+          backdropFilter: scrolled ? "blur(20px)" : "none",
+          borderBottom: scrolled ? "1px solid rgba(255,255,255,0.05)" : "none",
+        }}
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <motion.a
@@ -39,8 +40,8 @@ export default function Navigation() {
             className="text-xl font-bold tracking-tight"
             whileHover={{ scale: 1.05 }}
           >
-            <span className="text-accent">STELLAR</span>
-            <span className="text-white/60">.dev</span>
+            <span style={{ color: "#7c3aed" }}>STELLAR</span>
+            <span style={{ color: "rgba(255,255,255,0.6)" }}>.dev</span>
           </motion.a>
 
           <div className="hidden md:flex items-center gap-8">
@@ -48,17 +49,30 @@ export default function Navigation() {
               <motion.a
                 key={link.href}
                 href={link.href}
-                className="text-sm text-white/60 hover:text-white transition-colors relative group"
-                whileHover={{ y: -2 }}
+                className="text-sm relative group"
+                style={{ color: "rgba(255,255,255,0.6)" }}
+                whileHover={{ y: -2, color: "#ffffff" }}
               >
                 {link.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-accent transition-all duration-300 group-hover:w-full" />
+                <span
+                  className="absolute -bottom-1 left-0 w-0 h-px transition-all duration-300 group-hover:w-full"
+                  style={{ backgroundColor: "#7c3aed" }}
+                />
               </motion.a>
             ))}
             <motion.a
               href="#contact"
-              className="px-5 py-2 text-sm font-medium bg-accent/20 text-accent border border-accent/30 rounded-full hover:bg-accent hover:text-white transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
+              className="px-5 py-2 text-sm font-medium rounded-full transition-all duration-300"
+              style={{
+                backgroundColor: "rgba(124,58,237,0.2)",
+                color: "#7c3aed",
+                border: "1px solid rgba(124,58,237,0.3)",
+              }}
+              whileHover={{
+                scale: 1.05,
+                backgroundColor: "#7c3aed",
+                color: "#ffffff",
+              }}
               whileTap={{ scale: 0.95 }}
             >
               Let&apos;s Talk
@@ -67,7 +81,8 @@ export default function Navigation() {
 
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden text-white/60 hover:text-white transition-colors"
+            className="md:hidden transition-colors"
+            style={{ color: "rgba(255,255,255,0.6)" }}
           >
             {mobileOpen ? <X size={24} /> : <List size={24} />}
           </button>
@@ -80,7 +95,8 @@ export default function Navigation() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-background/95 backdrop-blur-xl md:hidden flex flex-col items-center justify-center gap-8"
+            className="fixed inset-0 z-40 backdrop-blur-xl md:hidden flex flex-col items-center justify-center gap-8"
+            style={{ backgroundColor: "rgba(3,0,20,0.95)" }}
           >
             {navLinks.map((link, i) => (
               <motion.a
@@ -90,7 +106,8 @@ export default function Navigation() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 onClick={() => setMobileOpen(false)}
-                className="text-2xl text-white/80 hover:text-accent transition-colors"
+                className="text-2xl transition-colors"
+                style={{ color: "rgba(255,255,255,0.8)" }}
               >
                 {link.label}
               </motion.a>
