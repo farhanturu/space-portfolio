@@ -30,7 +30,15 @@
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
-    canvas#space { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    #three-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
     .overlay { position: relative; z-index: 1; min-height: 100vh; }
     .fade-in {
       opacity: 0; transform: translateY(30px);
@@ -150,6 +158,7 @@
     .skill-card {
       padding: 1.5rem; border-radius: 1rem; background: var(--surface);
       border: 1px solid var(--border); transition: all 0.4s;
+      backdrop-filter: blur(10px);
     }
     .skill-card:hover { border-color: rgba(124,58,237,0.3); background: rgba(124,58,237,0.05); }
     .skill-icon {
@@ -177,7 +186,7 @@
     .project-card {
       border-radius: 1rem; background: var(--surface); border: 1px solid var(--border);
       padding: 2rem 2.5rem; display: flex; align-items: center; gap: 2.5rem;
-      cursor: pointer; transition: all 0.5s;
+      cursor: pointer; transition: all 0.5s; backdrop-filter: blur(10px);
     }
     .project-card:hover { border-color: rgba(255,255,255,0.1); }
     @media (max-width: 768px) {
@@ -223,6 +232,7 @@
       background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05);
       display: flex; align-items: center; justify-content: center;
       color: rgba(255,255,255,0.5); text-decoration: none; transition: all 0.3s;
+      backdrop-filter: blur(10px);
     }
     .social-link:hover {
       border-color: rgba(124,58,237,0.3); background: rgba(124,58,237,0.1);
@@ -238,6 +248,7 @@
       width: 100%; padding: 0.875rem 1.25rem; background: rgba(255,255,255,0.03);
       border: 1px solid rgba(255,255,255,0.06); border-radius: 0.75rem;
       color: #fff; font-family: inherit; font-size: 0.9rem; transition: all 0.3s; outline: none;
+      backdrop-filter: blur(10px);
     }
     .form-group input:focus, .form-group textarea:focus {
       border-color: rgba(124,58,237,0.5); background: rgba(124,58,237,0.05);
@@ -269,7 +280,7 @@
   </style>
 </head>
 <body>
-  <canvas id="space"></canvas>
+  <canvas id="three-canvas"></canvas>
 
   <nav id="navbar">
     <div class="nav-inner">
@@ -358,7 +369,7 @@
             <p>Real-time analytics dashboard with 3D data visualizations and interactive charts for monitoring cosmic events.</p>
             <div class="tech-tags"><span class="tech-tag">Next.js</span><span class="tech-tag">Three.js</span><span class="tech-tag">D3.js</span><span class="tech-tag">WebSocket</span></div>
           </div>
-          <div class="project-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="project-arrow"><svg viewBox="0 0 0 0"><path d="M7 17L17 7M17 7H7M17 7v10" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         </div>
         <div class="project-card fade-in fade-in-delay-1" data-hover="rgba(6,182,212,0.15)">
           <div class="project-info">
@@ -380,7 +391,7 @@
         </div>
         <div class="project-card fade-in fade-in-delay-3" data-hover="rgba(16,185,129,0.15)">
           <div class="project-info">
-            <div class="project-meta"><div class="project-dot" style="background:#10b981"></div><span class="project-cat">Web3 / DeFi</span><span class="project-cat">2023</span></div>
+            <div class="project-meta"><div class="project-dot" style="background:#10b981"></div><span class="project-cat">Web3 / DeFi</span><span class="module-dot"></div><span class="project-cat">2023</span></div>
             <h3>Gravity Protocol</h3>
             <p>Decentralized finance interface with real-time portfolio tracking and multi-chain wallet integration.</p>
             <div class="tech-tags"><span class="tech-tag">TypeScript</span><span class="tech-tag">Wagmi</span><span class="tech-tag">The Graph</span><span class="tech-tag">Solidity</span></div>
@@ -438,17 +449,21 @@
     </div>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
+    // Scroll fade-in
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
     }, { threshold: 0.1 });
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
+    // Nav scroll
     const nav = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
       nav.classList.toggle('scrolled', window.scrollY > 50);
     }, { passive: true });
 
+    // Mobile menu
     document.getElementById('menuBtn').addEventListener('click', () => {
       document.getElementById('mobileMenu').classList.toggle('active');
     });
@@ -456,94 +471,170 @@
       a.addEventListener('click', () => document.getElementById('mobileMenu').classList.remove('active'));
     });
 
+    // Project card hover
     document.querySelectorAll('.project-card').forEach(card => {
       const hoverColor = card.getAttribute('data-hover');
       card.addEventListener('mouseenter', () => { card.style.backgroundColor = hoverColor; });
       card.addEventListener('mouseleave', () => { card.style.backgroundColor = ''; });
     });
 
-    (function() {
-      const canvas = document.getElementById('space');
-      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      if (!gl) return;
-      let w, h;
-      function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; gl.viewport(0, 0, w, h); }
-      resize();
-      window.addEventListener('resize', resize);
+    // 3D Space Scene
+    (function () {
+      const canvas = document.getElementById('three-canvas');
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setClearColor(0x030014, 1);
 
-      const vs = gl.createShader(gl.VERTEX_SHADER);
-      gl.shaderSource(vs, 'attribute vec2 a;void main(){gl_Position=vec4(a,0,1);}');
-      gl.compileShader(vs);
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x030014, 0.035);
 
-      const fs = gl.createShader(gl.FRAGMENT_SHADER);
-      gl.shaderSource(fs, `
-        precision mediump float;
-        uniform float t;
-        uniform vec2 m;
-        uniform vec2 r;
-        float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-        float n(vec2 p){
-          vec2 i=floor(p),f=fract(p);
-          f=f*f*(3.0-2.0*f);
-          return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);
-        }
-        void main(){
-          vec2 uv=gl_FragCoord.xy/r;
-          vec2 p=uv*2.0-1.0;
-          p.x*=r.x/r.y;
-          float ti=t*0.15;
-          vec2 ms=(m-0.5)*0.3;
-          vec3 c=vec3(0.012,0.0,0.078);
-          for(float i=0.0;i<3.0;i++){
-            vec2 sp=uv*(200.0+i*150.0)+vec2(ti*(10.0+i*5.0),ti*(3.0+i*2.0))+ms*(20.0+i*10.0);
-            float s=h(floor(sp));
-            float b=step(0.98-i*0.005,s)*sin(ti*(2.0+s*4.0)+s*6.28)*0.5+0.5;
-            b*=0.5+s*0.5;
-            vec3 sc=mix(vec3(0.6,0.7,1.0),vec3(1.0,0.8,0.9),s);
-            c+=sc*b*(0.6+i*0.2);
-          }
-          float n1=n(p*2.0+vec2(ti*0.3,ti*0.2)+ms);
-          float n2=n(p*3.5-vec2(ti*0.2,ti*0.15)+ms*0.5);
-          float n3=n(p*1.0+vec2(ti*0.1,-ti*0.08));
-          float nb=smoothstep(0.3,0.8,n1*n2);
-          c+=mix(vec3(0.3,0.1,0.5),vec3(0.1,0.05,0.4),n3)*nb*0.15;
-          c*=1.0-length(p)*0.3;
-          gl_FragColor=vec4(c,1);
-        }
-      `);
-      gl.compileShader(fs);
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 0, 8);
 
-      const pg = gl.createProgram();
-      gl.attachShader(pg, vs);
-      gl.attachShader(pg, fs);
-      gl.linkProgram(pg);
-      gl.useProgram(pg);
+      // Lights
+      const ambientLight = new THREE.AmbientLight(0x222244, 0.5);
+      scene.add(ambientLight);
+      const pointLight1 = new THREE.PointLight(0x7c3aed, 1.5, 50);
+      pointLight1.position.set(5, 5, 5);
+      scene.add(pointLight1);
+      const pointLight2 = new THREE.PointLight(0xa78bfa, 1, 40);
+      pointLight2.position.set(-5, -3, 3);
+      scene.add(pointLight2);
+      const pointLight3 = new THREE.PointLight(0xfb64b6, 0.8, 30);
+      pointLight3.position.set(0, 4, -5);
+      scene.add(pointLight3);
 
-      const buf = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
-      const aLoc = gl.getAttribLocation(pg, 'a');
-      gl.enableVertexAttribArray(aLoc);
-      gl.vertexAttribPointer(aLoc, 2, gl.FLOAT, false, 0, 0);
+      // Starfield
+      const starGeo = new THREE.BufferGeometry();
+      const starCount = 2500;
+      const starPositions = new Float32Array(starCount * 3);
+      const starColors = new Float32Array(starCount * 3);
+      const starSizes = new Float32Array(starCount);
+      for (let i = 0; i < starCount; i++) {
+        const i3 = i * 3;
+        starPositions[i3] = (Math.random() - 0.5) * 100;
+        starPositions[i3 + 1] = (Math.random() - 0.5) * 100;
+        starPositions[i3 + 2] = (Math.random() - 0.5) * 100;
+        const c = new THREE.Color().setHSL(0.65 + Math.random() * 0.15, 0.3, 0.7 + Math.random() * 0.3);
+        starColors[i3] = c.r;
+        starColors[i3 + 1] = c.g;
+        starColors[i3 + 2] = c.b;
+        starSizes[i] = Math.random() * 2 + 0.5;
+      }
+      starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+      starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+      starGeo.setAttribute('size', new THREE.BufferAttribute(starSizes, 1));
+      const starMat = new THREE.PointsMaterial({ size: 0.08, vertexColors: true, transparent: true, opacity: 0.9, sizeAttenuation: true });
+      const stars = new THREE.Points(starGeo, starMat);
+      scene.add(stars);
 
-      const ut = gl.getUniformLocation(pg, 't');
-      const um = gl.getUniformLocation(pg, 'm');
-      const ur = gl.getUniformLocation(pg, 'r');
+      // Wireframe Octahedron
+      const octoGeo = new THREE.OctahedronGeometry(1.2, 0);
+      const octoMat = new THREE.MeshPhongMaterial({ color: 0x7c3aed, emissive: 0x4c1d95, emissiveIntensity: 0.5, wireframe: true, transparent: true, opacity: 0.6 });
+      const octahedron = new THREE.Mesh(octoGeo, octoMat);
+      octahedron.position.set(-3.5, 1.5, -2);
+      scene.add(octahedron);
 
-      let mx = 0.5, my = 0.5;
-      document.addEventListener('mousemove', e => {
-        mx = e.clientX / window.innerWidth;
-        my = 1.0 - e.clientY / window.innerHeight;
+      // Wireframe Icosahedron
+      const icoGeo = new THREE.IcosahedronGeometry(0.8, 0);
+      const icoMat = new THREE.MeshPhongMaterial({ color: 0xa78bfa, emissive: 0x6d28d9, emissiveIntensity: 0.4, wireframe: true, transparent: true, opacity: 0.5 });
+      const icosahedron = new THREE.Mesh(icoGeo, icoMat);
+      icosahedron.position.set(4, -2, -3);
+      scene.add(icosahedron);
+
+      // Wireframe Torus
+      const torusGeo = new THREE.TorusGeometry(0.7, 0.2, 8, 24);
+      const torusMat = new THREE.MeshPhongMaterial({ color: 0xc080ff, emissive: 0x7c3aed, emissiveIntensity: 0.3, wireframe: true, transparent: true, opacity: 0.5 });
+      const torus = new THREE.Mesh(torusGeo, torusMat);
+      torus.position.set(2.5, 2.5, -4);
+      scene.add(torus);
+
+      // Wireframe Tetrahedron
+      const tetraGeo = new THREE.TetrahedronGeometry(0.6, 0);
+      const tetraMat = new THREE.MeshPhongMaterial({ color: 0xfb64b6, emissive: 0xbe185d, emissiveIntensity: 0.4, wireframe: true, transparent: true, opacity: 0.5 });
+      const tetrahedron = new THREE.Mesh(tetraGeo, tetraMat);
+      tetrahedron.position.set(-2, -3, -1.5);
+      scene.add(tetrahedron);
+
+      // Wireframe Dodecahedron
+      const dodecGeo = new THREE.DodecahedronGeometry(0.5, 0);
+      const dodecMat = new THREE.MeshPhongMaterial({ color: 0x06b6d4, emissive: 0x0e7490, emissiveIntensity: 0.3, wireframe: true, transparent: true, opacity: 0.4 });
+      const dodecahedron = new THREE.Mesh(dodecGeo, dodecMat);
+      dodecahedron.position.set(5, 0.5, -5);
+      scene.add(dodecahedron);
+
+      // Wireframe Ring
+      const ringGeo = new THREE.TorusGeometry(2, 0.03, 8, 64);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0x7c3aed, transparent: true, opacity: 0.15 });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.position.set(0, 0, -3);
+      ring.rotation.x = Math.PI * 0.3;
+      scene.add(ring);
+
+      // Second Ring
+      const ring2 = ring.clone();
+      ring2.rotation.x = Math.PI * 0.6;
+      ring2.rotation.y = Math.PI * 0.2;
+      ring2.scale.set(1.3, 1.3, 1.3);
+      scene.add(ring2);
+
+      // Mouse
+      let mouseX = 0, mouseY = 0;
+      document.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+        mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
       }, { passive: true });
 
-      function render(ts) {
-        gl.uniform1f(ut, ts * 0.001);
-        gl.uniform2f(um, mx, my);
-        gl.uniform2f(ur, w, h);
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-        requestAnimationFrame(render);
+      // Resize
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Animate
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const t = clock.getElapsedTime();
+
+        octahedron.rotation.x = t * 0.3;
+        octahedron.rotation.y = t * 0.2;
+        octahedron.position.y = 1.5 + Math.sin(t * 0.5) * 0.4;
+
+        icosahedron.rotation.x = t * 0.4;
+        icosahedron.rotation.z = t * 0.25;
+        icosahedron.position.y = -2 + Math.sin(t * 0.7 + 1) * 0.3;
+
+        torus.rotation.x = t * 0.2;
+        torus.rotation.y = t * 0.35;
+        torus.position.y = 2.5 + Math.sin(t * 0.6 + 2) * 0.35;
+
+        tetrahedron.rotation.x = t * 0.5;
+        tetrahedron.rotation.y = t * 0.3;
+        tetrahedron.position.y = -3 + Math.sin(t * 0.4 + 3) * 0.25;
+
+        dodecahedron.rotation.x = t * 0.25;
+        dodecahedron.rotation.y = t * 0.4;
+        dodecahedron.position.y = 0.5 + Math.sin(t * 0.55 + 4) * 0.3;
+
+        ring.rotation.z = t * 0.05;
+        ring2.rotation.z = -t * 0.03;
+
+        stars.rotation.y = t * 0.01;
+        stars.rotation.x = t * 0.005;
+
+        camera.position.x += (mouseX * 1.2 - camera.position.x) * 0.03;
+        camera.position.y += (-mouseY * 0.6 - camera.position.y) * 0.03;
+        camera.lookAt(0, 0, -2);
+
+        pointLight1.position.x = Math.sin(t * 0.3) * 6;
+        pointLight1.position.y = Math.cos(t * 0.2) * 4;
+
+        renderer.render(scene, camera);
       }
-      requestAnimationFrame(render);
+      animate();
     })();
   </script>
 </body>
